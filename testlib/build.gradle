@@ -26,8 +26,8 @@ android {
                 variant.outputs.each { output ->
                     def outputFile = output.outputFile
                     if (outputFile != null && outputFile.name.endsWith('release.aar')) {
-                        def fileName = "test"
-                        def outputPath = "../output/test/}"
+                        def fileName = "testlib"
+                        def outputPath = "../output/test/"
                         def classesJarPath = "build/intermediates/bundles/release/"
                         tasks.create(name: "export", type: Jar) {
                             from zipTree(classesJarPath + "classes.jar")
