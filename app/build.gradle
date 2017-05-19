@@ -1,0 +1,87 @@
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
+apply plugin: 'com.android.application'
+
+
+Properties properties = new Properties();
+properties.load(project.file("test.properties").newDataInputStream())
+
+def KEY = "0000000000000001"
+
+static String encrypt(String password, String input) {
+    String output;
+    try {
+        SecretKeySpec key = new SecretKeySpec(password.getBytes("UTF-8"),"AES");
+        IvParameterSpec ivp = new IvParameterSpec(password.getBytes("UTF-8"));
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE,key,ivp);
+        byte[] buffer = cipher.doFinal(input.getBytes("UTF-8"));
+        output = byte2hex(buffer);
+    } catch (Exception e) {
+        output = e.getMessage()
+    }
+    return output;
+}
+
+public static String byte2hex(byte[] b) {
+    String hs = "";
+    String temp;
+    for (int n = 0; n < b.length; n++) {
+        temp = (Integer.toHexString(b[n] & 0XFF));
+        if (temp.length() == 1) {
+            hs = hs + "0" + temp;
+        } else {
+            hs = hs + temp;
+        }
+    }
+    return hs.toUpperCase();
+}
+
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
+    defaultConfig {
+        applicationId "test.test"
+        minSdkVersion 15
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+
+        buildConfigField "String", "KEY" ,"\"" + KEY +"\""
+        buildConfigField "String", "KEY_M" ,"\"" + encrypt(KEY,properties.get("KEY_M")) +"\""
+        buildConfigField "String", "TEST" ,"\"" + encrypt(KEY,properties.get("TEST")) +"\""
+        buildConfigField "String", "TAG" ,"\"" + encrypt(KEY,properties.get("TAG")) +"\""
+        buildConfigField "Boolean","DEBUG_M", properties.get("DEBUG_M")
+        buildConfigField "Integer","INT", properties.get("INT")
+        buildConfigField "Float","FLOAT", properties.get("FLOAT")
+        buildConfigField "Long","LONG", properties.get("LONG")
+        buildConfigField "Double","DOUBLE", properties.get("DOUBLE")
+
+
+        ndk {
+            abiFilters  "armeabi"
+        }
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    testCompile 'junit:junit:4.12'
+}
