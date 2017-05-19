@@ -25,8 +25,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button add, delete,show;
     int a = 10;
     int b = 20;
-    String dexPath = Environment.getExternalStorageDirectory() + "/Test/test.jar";
-    String optPath = Environment.getExternalStorageDirectory() + "/Test/test";
+    String dexPath;
+    String optPath ;
     DexClassLoader loader;
     Method add_m, delete_m,show_m;
     Class<?> mClass;
@@ -53,13 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
        }
 
-
         witreToDex(new File(Environment.getExternalStorageDirectory() + "/Test/testlib.dex"),new File(dexPath));
-        long length = new File(dexPath).length();
-        boolean isFile  =new File(dexPath).isFile();
-
-        loadFis(new File(dexPath));
-
         Log.d(TAG,new File(dexPath).getAbsolutePath() +"   " + new File(dexPath).exists()+"   " + new File(dexPath).isFile() +"    " + new File(dexPath).length() );
         loader = new DexClassLoader(dexPath, optPath, null, ClassLoader.getSystemClassLoader());
         try {
