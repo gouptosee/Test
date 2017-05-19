@@ -23,4 +23,15 @@
         android:layout_height="wrap_content"
         android:text="Show" />
 
+    <Button
+        android:id="@+id/showT"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ShowT" />
+    <Button
+        android:id="@+id/hideT"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="HideT" />
+
 </LinearLayout>

@@ -1,5 +1,6 @@
 package test.test;
 
+import android.content.Context;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -54,40 +55,60 @@ import dalvik.system.DexClassLoader;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     String TAG = "MainActivity";
-    Button add, delete,show;
+    Button add, delete,show,showT,hideT;
     int a = 10;
     int b = 20;
     String dexPath;
     String optPath ;
     DexClassLoader loader;
-    Method add_m, delete_m,show_m;
+    Method add_m, delete_m,show_m,show_t,hide_t;
     Class<?> mClass;
-    Object mObject;
+    Object mObject,mObject2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Utils.checkPermission(this);
+
+        initView();
+        initData();
+        initReflect();
+
+
+
+    }
+
+    private void initView(){
         add = (Button) findViewById(R.id.add);
         delete = (Button) findViewById(R.id.del);
         show = (Button) findViewById(R.id.show);
+        showT = (Button) findViewById(R.id.showT);
+        hideT = (Button) findViewById(R.id.hideT);
         add.setOnClickListener(this);
         delete.setOnClickListener(this);
         show.setOnClickListener(this);
+        showT.setOnClickListener(this);
+        hideT.setOnClickListener(this);
+    }
+
+    private void initData(){
         dexPath = getDir("dex",MODE_PRIVATE).getAbsolutePath() +"/test.dex";
         optPath = getDir("opt",MODE_PRIVATE).getAbsolutePath();
-       try {
-           if(new File(dexPath).exists()&&new File(dexPath).isDirectory()) new File(dexPath).delete();
-           if(!new File(dexPath).exists())  Log.i(TAG," "+  new File(dexPath).createNewFile());
-           if(!new File(optPath).exists())  Log.i(TAG,"" +  new File(optPath).mkdirs());
-       }catch (Exception e){
+        try {
+            if(new File(dexPath).exists()&&new File(dexPath).isDirectory()) new File(dexPath).delete();
+            if(!new File(dexPath).exists())  Log.i(TAG," "+  new File(dexPath).createNewFile());
+            if(!new File(optPath).exists())  Log.i(TAG,"" +  new File(optPath).mkdirs());
+        }catch (Exception e){
 
-       }
+        }
 
         witreToDex(new File(Environment.getExternalStorageDirectory() + "/Test/testlib.dex"),new File(dexPath));
         Log.d(TAG,new File(dexPath).getAbsolutePath() +"   " + new File(dexPath).exists()+"   " + new File(dexPath).isFile() +"    " + new File(dexPath).length() );
+    }
 
+    private void initReflect(){
         loader = new DexClassLoader(dexPath, optPath, null, ClassLoader.getSystemClassLoader());
         try {
             mClass = loader.loadClass("test.testlib.TestLib");
@@ -96,12 +117,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             add_m = mClass.getDeclaredMethod("add", int.class, int.class);
             delete_m = mClass.getDeclaredMethod("delete", int.class, int.class);
             show_m = mClass.getDeclaredMethod("toast");
+
+            Class<?> mClass2 = loader.loadClass("test.testlib.TestClass");
+            Constructor<?> constructor1 = mClass2.getConstructor();
+            mObject2 = constructor1.newInstance();
+            show_t = mClass2.getDeclaredMethod("showT", Context.class);
+            hide_t = mClass2.getDeclaredMethod("hideT",Context.class,View.class);
+
+
+
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this,e.toString(),Toast.LENGTH_LONG).show();
         }
     }
 
+    View view;
     @Override
     public void onClick(View v) {
         try {
@@ -117,6 +148,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 case R.id.show:
                     Toast.makeText(this,show_m.invoke(null) +"",Toast.LENGTH_LONG).show();
+                    break;
+                case R.id.showT:
+                   view = (View) show_t.invoke(mObject2,this);
+                    break;
+                case R.id.hideT:
+                    if(view!=null)
+                    hide_t.invoke(mObject2,this,view);
                     break;
             }
         } catch (Exception e) {
