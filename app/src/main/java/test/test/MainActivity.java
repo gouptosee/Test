@@ -10,15 +10,47 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.math.BigInteger;
+
 
 import dalvik.system.DexClassLoader;
 
+/**
+ * 步骤 ：
+ * 1.创建一个libary 定义相关的类或方法
+ * 2.将library打包成jar
+ *     studio右侧gradle选择library -->> assemble
+ * 3.将library jar 打包成dex
+ *     cmd  进入build-tools
+ *     dx --dex --output=f:\testlib.dex f:\classes.ja
+ *     output后面依次是输出路径和源文件jar路径
+ * 4.将testlib放在 设备  /Test/testlib.dex 下
+ *     实际开发都有自己的固定路径,dex可以直接放进去或者从网络下载过来
+ * 5.将dex写入 设备的 getDir()目录下
+ *     这是必须的,默认其他路径下都是无法加载的,和实际的读写权限有关，并不仅限于Manifest中的权限
+ * 6.通过类加载器装载dex文件 以加载相关的Class
+ *      类装载器需要传两个路径
+ *      第一个是dex文件的绝对路径
+ *      第二个是存放解压后的dex文件路径
+ *      最好用两个文件夹分别存放
+ * 7.通过反射 从Class中获取相关的方法
+ *     这里注意静态方法和非静态方法的区别
+ *     静态方法invoke不需要类对象
+ *     public方法invoke需要装载类对象
+ *
+ *
+ * SDK开发很大程度上依赖于反射
+ * 有时候为了减少体积,会采用shell和core分开的形式
+ * 用户导入shell,shell去网络获取core
+ * 通过接口信息获取所有core需要操作的方法和参数
+ * 然后通过类加载器加载 通过反射获取方法并加载相应的初始化或回收方法
+ *
+ *
+ *
+ */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     String TAG = "MainActivity";
@@ -55,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         witreToDex(new File(Environment.getExternalStorageDirectory() + "/Test/testlib.dex"),new File(dexPath));
         Log.d(TAG,new File(dexPath).getAbsolutePath() +"   " + new File(dexPath).exists()+"   " + new File(dexPath).isFile() +"    " + new File(dexPath).length() );
+
         loader = new DexClassLoader(dexPath, optPath, null, ClassLoader.getSystemClassLoader());
         try {
             mClass = loader.loadClass("test.testlib.TestLib");
