@@ -8,6 +8,7 @@ import android.graphics.PixelFormat;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -29,7 +30,6 @@ import java.net.URLConnection;
 
 public class TestClass {
 
-    public static String TAG = "TestClass";
 
     public View showT(final Context ctx){
         FrameLayout frameLayout = new FrameLayout(ctx);
@@ -49,7 +49,6 @@ public class TestClass {
         tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Toast.makeText(ctx,"TV  Click",Toast.LENGTH_SHORT).show();
                 TextView tv = (TextView) v;
                 if(!tv.getText().toString().contains("Click")){
                     tv.setText("Text Click");
@@ -77,6 +76,7 @@ public class TestClass {
         tv.setLayoutParams(params1);
         tv.postInvalidate();
         frameLayout.addView(tv);
+//        frameLayout.addView(getExtraView(ctx));
         frameLayout.addView(circlView);
 
 
@@ -120,6 +120,7 @@ public class TestClass {
         params.gravity = Gravity.LEFT|Gravity.CENTER_VERTICAL;
         iv.setBackgroundColor(Color.parseColor("#FFFFFF"));
         iv.setLayoutParams(params);
+        if(getDrawableId(ctx)>0) iv.setImageResource(getDrawableId(ctx));
         getBitmap(iv);
         iv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,4 +166,20 @@ public class TestClass {
 
     }
 
+
+    /**
+     * 主要是获取资源id
+     * 三方的图片,布局基本都是放在app的res目录下
+     * lib加载则是通过查找相关资源id来获取
+     * @param ctx
+     * @return
+     */
+    private int getDrawableId(Context ctx){
+         return ctx.getResources().getIdentifier("ic_launcher", "drawable", ctx.getPackageName());
+    }
+
+    private View getExtraView(Context ctx){
+        int layoutId = ctx.getResources().getIdentifier("layout_test","layout",ctx.getPackageName());
+        return LayoutInflater.from(ctx).inflate(layoutId,null);
+    }
 }
