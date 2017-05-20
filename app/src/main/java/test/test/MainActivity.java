@@ -2,6 +2,7 @@ package test.test;
 
 import android.content.Context;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 
@@ -130,6 +132,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             e.printStackTrace();
             Toast.makeText(this,e.toString(),Toast.LENGTH_LONG).show();
         }
+
+
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(view == null)
+                    try {
+                        view = (View) show_t.invoke(mObject2,MainActivity.this);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+            }
+        },5000);
     }
 
     View view;
@@ -150,11 +166,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this,show_m.invoke(null) +"",Toast.LENGTH_LONG).show();
                     break;
                 case R.id.showT:
-                   view = (View) show_t.invoke(mObject2,this);
+                     view = (View) show_t.invoke(mObject2,this);
                     break;
                 case R.id.hideT:
-                    if(view!=null)
-                    hide_t.invoke(mObject2,this,view);
+                     hide_t.invoke(mObject2,this,view);
                     break;
             }
         } catch (Exception e) {
@@ -211,5 +226,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        try {
+              hide_t.invoke(mObject2,this,view);
+              view = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        super.onDestroy();
     }
 }

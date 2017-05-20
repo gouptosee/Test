@@ -3,18 +3,13 @@ package test.testlib;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import static android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 
 /**
  * Created by admin on 2017/5/19.
@@ -42,15 +37,35 @@ public class TestClass {
         tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ctx,"TV  Click",Toast.LENGTH_SHORT).show();
+//                Toast.makeText(ctx,"TV  Click",Toast.LENGTH_SHORT).show();
                 TextView tv = (TextView) v;
-                tv.setText("Text Click");
+                if(!tv.getText().toString().contains("Click")){
+                    tv.setText("Text Click");
+                }else {
+                    tv.setText("TextClass");
+                }
             }
         });
+
+        CirclView circlView = new CirclView(ctx);
+        FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params2.width = 40;
+        params2.height = 40;
+        params2.gravity = Gravity.RIGHT|Gravity.TOP;
+        circlView.setLayoutParams(params2);
+        circlView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideT(ctx, (View) v.getParent());
+            }
+        });
+
+
 
         tv.setLayoutParams(params1);
         tv.postInvalidate();
         frameLayout.addView(tv);
+        frameLayout.addView(circlView);
 
 
         WindowManager manager = (WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE);
@@ -62,14 +77,23 @@ public class TestClass {
                 WindowManager.LayoutParams.WRAP_CONTENT,type,flag, PixelFormat.TRANSLUCENT);
         params.gravity = Gravity.BOTTOM;
 
+        frameLayout.requestFocus();
         manager.addView(frameLayout,params);
+
         return frameLayout;
 
     }
 
     public void hideT(Context ctx,View view){
-        WindowManager manager = (WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE);
-        manager.removeView(view);
+        try {
+            if (view != null) {
+                WindowManager manager = (WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE);
+                manager.removeView(view);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
