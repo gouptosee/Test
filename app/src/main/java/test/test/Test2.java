@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -38,7 +39,43 @@ public class Test2 {
 
 //        loadBitmap();
 //        copyFile();
-        copyText();
+//        copyText();
+        getHttpRes();
+    }
+
+
+
+    private static  void getHttpRes(){
+        String url = "http://59.110.0.207:82/news/get-news-lists?cid=2&p=2";
+        HttpURLConnection conn = null;
+        try {
+            conn = (HttpURLConnection) new URL(url).openConnection();
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(5000);
+            conn.setRequestMethod("POST");
+            conn.connect();
+            System.out.println("code --- >>>   "+conn.getResponseCode() +"");
+            if(conn.getResponseCode() == 200){
+//                String content = conn.getContentEncoding();
+//                System.out.println("content ----- >>>>   "+conn.getContent().toString() +"");
+                System.out.println(conn.getURL().toString());
+                StringBuilder builder = new StringBuilder();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String len ;
+                while ((len = reader.readLine()) != null){
+                    builder.append(len);
+                }
+                System.out.println("content ----- >>>>   "+builder.toString());
+
+
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            conn.disconnect();
+        }
     }
 
 

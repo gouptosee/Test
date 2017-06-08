@@ -35,4 +35,10 @@ public class Utils {
         }
 
     }
+
+
+    public static String test(){
+        String aaa = "1     2      3";
+        return aaa;
+    }
 }
