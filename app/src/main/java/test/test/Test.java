@@ -51,7 +51,11 @@ public class Test {
 //        String key = "0101010101010101";
 //        String key = randomAESKey();
 //        String str = md5("发生发生大幅度上发电示范试点");
-//        String str = md5(new File("F:/新建文本文档.txt"));
+        String str = md5(new File("F:/2/新建文件夹/dex/testlib.dex"));
+        System.out.println(str);
+
+        String str2 = md5(new File("F:/2/新建文件夹/dex/bdxadsdk.jar"));
+        System.out.println(str2);
 //        System.out.println(str);
 //        System.out.println(key);
 //        System.out.println(encrypt(key,origin));
